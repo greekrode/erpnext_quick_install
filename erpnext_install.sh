@@ -175,13 +175,12 @@ check_os
 cd $(sudo -u $USER echo $HOME)
 
 # Next let's set some important parameters.
-# We will need your required SQL root passwords
+# We will generate your SQL root passwords
 echo -e "${YELLOW}Now let's set some important parameters...${NC}"
 sleep 1
-echo -e "${YELLOW}We will need your required SQL root password${NC}"
+echo -e "${YELLOW}Generating a secure SQL root password...${NC}"
 sleep 1
-sqlpasswrd=$(ask_twice "What is your required SQL root password" "true")
-sleep 1
+sqlpasswrd=$(openssl rand -base64 18)
 echo -e "\n"
 
 # Now let's make sure your instance has the most updated packages
@@ -531,6 +530,9 @@ case "$continue_prod" in
     echo -e "${GREEN}Done!"
     sleep 5
 
+
+    echo -e "\n"
+
     echo -e "${GREEN}-----------------------------------------------------------------------------------------------"
     echo -e "Congratulations! You have successfully installed Frappe and ERPNext $version_choice Development Environment."
     echo -e "Start your instance by running bench start to start your server and visiting http://$server_ip:8000"
@@ -539,3 +541,7 @@ case "$continue_prod" in
     echo -e "-----------------------------------------------------------------------------------------------${NC}"
     ;;
 esac
+
+echo -e "${GREEN}Your generated SQL root password is: ${sqlpasswrd}${NC}"
+echo -e "${YELLOW}Please save this password securely.${NC}"
+sleep 1 
