@@ -499,7 +499,7 @@ case "$continue_prod" in
     "yes" | "y")
         sleep 2
         # Setup supervisor and nginx config
-        bench get-app https://github.com/greekrode/builder --branch $bench_version &&
+        bench get-app https://github.com/greekrode/builder --branch develop &&
             bench --site $site_name install-app builder
         sleep 1
         ;;
@@ -512,7 +512,7 @@ case "$continue_prod" in
     "yes" | "y")
         sleep 2
         # Setup supervisor and nginx config
-        bench get-app https://github.com/greekrode/print_designer --branch $bench_version &&
+        bench get-app https://github.com/greekrode/print_designer --branch develop &&
             bench --site $site_name install-app print_designer
         sleep 1
         ;;
