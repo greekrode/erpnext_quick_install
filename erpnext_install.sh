@@ -54,21 +54,21 @@ check_os() {
 check_os
 
 # Detect the platform (similar to $OSTYPE)
-OS="`uname`"
+OS="$(uname)"
 case $OS in
-  'Linux')
+'Linux')
     OS='Linux'
-    if [ -f /etc/redhat-release ] ; then
-      DISTRO='CentOS'
-    elif [ -f /etc/debian_version ] ; then
-      if [ "$(lsb_release -si)" == "Ubuntu" ]; then
-        DISTRO='Ubuntu'
-      else
-        DISTRO='Debian'
-      fi
+    if [ -f /etc/redhat-release ]; then
+        DISTRO='CentOS'
+    elif [ -f /etc/debian_version ]; then
+        if [ "$(lsb_release -si)" == "Ubuntu" ]; then
+            DISTRO='Ubuntu'
+        else
+            DISTRO='Debian'
+        fi
     fi
     ;;
-  *) ;;
+*) ;;
 esac
 
 ask_twice() {
@@ -113,10 +113,19 @@ echo -e "${YELLOW}Please enter the number of the corresponding ERPNext version y
 versions=("Version 13" "Version 14" "Version 15")
 select version_choice in "${versions[@]}"; do
     case $REPLY in
-        1) bench_version="version-13"; break;;
-        2) bench_version="version-14"; break;;
-        3) bench_version="version-15"; break;;
-        *) echo -e "${RED}Invalid option. Please select a valid version.${NC}";;
+    1)
+        bench_version="version-13"
+        break
+        ;;
+    2)
+        bench_version="version-14"
+        break
+        ;;
+    3)
+        bench_version="version-15"
+        break
+        ;;
+    *) echo -e "${RED}Invalid option. Please select a valid version.${NC}" ;;
     esac
 done
 
@@ -208,50 +217,52 @@ py_minor=$(echo "$py_version" | cut -d '.' -f 2)
 
 if [ -z "$py_version" ] || [ "$py_major" -lt 3 ] || [ "$py_major" -eq 3 -a "$py_minor" -lt 10 ]; then
     echo -e "${LIGHT_BLUE}It appears this instance does not meet the minimum Python version required for ERPNext 14 (Python3.10)...${NC}"
-    sleep 2 
+    sleep 2
     echo -e "${YELLOW}Not to worry, we will sort it out for you${NC}"
     sleep 4
     echo -e "${YELLOW}Installing Python 3.10+...${NC}"
     sleep 2
 
-    sudo apt -qq install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev -y && \
-    wget https://www.python.org/ftp/python/3.10.11/Python-3.10.11.tgz && \
-    tar -xf Python-3.10.11.tgz && \
-    cd Python-3.10.11 && \
-    ./configure --prefix=/usr/local --enable-optimizations --enable-shared LDFLAGS="-Wl,-rpath /usr/local/lib" && \
-    make -j $(nproc) && \
-    sudo make altinstall && \
-    cd .. && \
-    sudo rm -rf Python-3.10.11 && \
-    sudo rm Python-3.10.11.tgz && \
-    pip3.10 install --user --upgrade pip && \
-    echo -e "${GREEN}Python3.10 installation successful!${NC}"
+    sudo apt -qq install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev -y &&
+        wget https://www.python.org/ftp/python/3.10.11/Python-3.10.11.tgz &&
+        tar -xf Python-3.10.11.tgz &&
+        cd Python-3.10.11 &&
+        ./configure --prefix=/usr/local --enable-optimizations --enable-shared LDFLAGS="-Wl,-rpath /usr/local/lib" &&
+        make -j $(nproc) &&
+        sudo make altinstall &&
+        cd .. &&
+        sudo rm -rf Python-3.10.11 &&
+        sudo rm Python-3.10.11.tgz &&
+        pip3.10 install --user --upgrade pip &&
+        echo -e "${GREEN}Python3.10 installation successful!${NC}"
     sleep 2
 fi
 echo -e "\n"
 echo -e "${YELLOW}Installing additional Python packages and Redis Server${NC}"
 sleep 2
-sudo apt install git python3-dev python3-setuptools python3-venv python3-pip redis-server -y && \
+sudo apt install git python3-dev python3-setuptools python3-venv python3-pip redis-server -y &&
 
-# Detect the architecture
-arch=$(uname -m)
+    # Detect the architecture
+    arch=$(uname -m)
 case $arch in
-    x86_64) arch="amd64" ;;
-    aarch64) arch="arm64" ;;
-    *) echo -e "${RED}Unsupported architecture: $arch${NC}"; exit 1 ;;
+x86_64) arch="amd64" ;;
+aarch64) arch="arm64" ;;
+*)
+    echo -e "${RED}Unsupported architecture: $arch${NC}"
+    exit 1
+    ;;
 esac
 
 sudo apt install fontconfig libxrender1 xfonts-75dpi xfonts-base -y
 # Download and install wkhtmltox for the detected architecture
-wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.jammy_$arch.deb && \
-sudo dpkg -i wkhtmltox_0.12.6.1-2.jammy_$arch.deb || true && \
-sudo cp /usr/local/bin/wkhtmlto* /usr/bin/ && \
-sudo chmod a+x /usr/bin/wk* && \
-sudo rm wkhtmltox_0.12.6.1-2.jammy_$arch.deb && \
-sudo apt --fix-broken install -y && \
-sudo apt install fontconfig xvfb libfontconfig xfonts-base xfonts-75dpi libxrender1 -y && \
-
-echo -e "${GREEN}Done!${NC}"
+wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.jammy_$arch.deb &&
+    sudo dpkg -i wkhtmltox_0.12.6.1-2.jammy_$arch.deb || true &&
+    sudo cp /usr/local/bin/wkhtmlto* /usr/bin/ &&
+    sudo chmod a+x /usr/bin/wk* &&
+    sudo rm wkhtmltox_0.12.6.1-2.jammy_$arch.deb &&
+    sudo apt --fix-broken install -y &&
+    sudo apt install fontconfig xvfb libfontconfig xfonts-base xfonts-75dpi libxrender1 -y &&
+    echo -e "${GREEN}Done!${NC}"
 sleep 1
 echo -e "\n"
 #... And mariadb with some extra needed applications.
@@ -303,9 +314,9 @@ sleep 2
 curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
 
 # Add environment variables to .profile
-echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.profile
-echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.profile
-echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion' >> ~/.profile
+echo 'export NVM_DIR="$HOME/.nvm"' >>~/.profile
+echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm' >>~/.profile
+echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion' >>~/.profile
 
 # Source .profile to load the new environment variables in the current session
 source ~/.profile
@@ -326,8 +337,8 @@ sleep 2
 
 # Now let's reactivate virtual environment
 if [ -z "$py_version" ] || [ "$py_major" -lt 3 ] || [ "$py_major" -eq 3 -a "$py_minor" -lt 10 ]; then
-    python3.10 -m venv $USER && \
-    source $USER/bin/activate
+    python3.10 -m venv $USER &&
+        source $USER/bin/activate
     nvm use $node_version
 fi
 
@@ -340,7 +351,6 @@ externally_managed_file=$(find /usr/lib/python3.*/EXTERNALLY-MANAGED 2>/dev/null
 if [[ -n "$externally_managed_file" ]]; then
     sudo rm "$externally_managed_file" || true
 fi
-
 
 sudo apt install python3-pip -y
 sudo pip3 install frappe-bench
@@ -362,9 +372,8 @@ sleep 2
 echo -e "${YELLOW}Now setting up your site. This might take a few minutes. Please wait...${NC}"
 sleep 1
 # Change directory to frappe-bench
-cd frappe-bench && \
-
-sudo chmod -R o+rx /home/$(echo $USER)
+cd frappe-bench &&
+    sudo chmod -R o+rx /home/$(echo $USER)
 
 bench new-site $site_name --db-root-password $sqlpasswrd --admin-password $adminpasswrd
 
@@ -374,12 +383,13 @@ echo -e "${LIGHT_BLUE}Would you like to install ERPNext? (yes/no)${NC}"
 read -p "Response: " erpnext_install
 erpnext_install=$(echo "$erpnext_install" | tr '[:upper:]' '[:lower:]')
 case "$erpnext_install" in
-    "yes" | "y")
+"yes" | "y")
     sleep 2
     # Setup supervisor and nginx config
-    bench get-app erpnext --branch $bench_version && \
-    bench --site $site_name install-app erpnext
+    bench get-app erpnext --branch $bench_version &&
+        bench --site $site_name install-app erpnext
     sleep 1
+    ;;
 esac
 
 # Dynamically set the Python version for the playbook file path
@@ -391,13 +401,13 @@ echo -e "${LIGHT_BLUE}Would you like to continue with production install? (yes/n
 read -p "Response: " continue_prod
 continue_prod=$(echo "$continue_prod" | tr '[:upper:]' '[:lower:]')
 case "$continue_prod" in
-    "yes" | "y")
+"yes" | "y")
 
     echo -e "${YELLOW}Installing packages and dependencies for Production...${NC}"
     sleep 2
     # Setup supervisor and nginx config
-    yes | sudo bench setup production $USER && \
-    echo -e "${YELLOW}Applying necessary permissions to supervisor...${NC}"
+    yes | sudo bench setup production $USER &&
+        echo -e "${YELLOW}Applying necessary permissions to supervisor...${NC}"
     sleep 1
     # Change ownership of supervisord.conf
     # Path to the supervisord.conf file
@@ -416,28 +426,50 @@ case "$continue_prod" in
         sudo sed -i "5a $SEARCH_PATTERN" "$FILE"
     fi
 
+    node_dir=$(which node)
+
+    # Replace /usr/bin/node with the value from which node in ~/frappe-bench/config/supervisor.conf
+    supervisor_conf="$HOME/frappe-bench/config/supervisor.conf"
+    if [ -f "$supervisor_conf" ]; then
+        sed -i "s|/usr/bin/node|$node_dir|g" "$supervisor_conf"
+        echo -e "${GREEN}Updated node path in supervisor.conf to $node_dir${NC}"
+    else
+        echo -e "${RED}supervisor.conf not found at $supervisor_conf${NC}"
+    fi
+
     # Restart supervisor
-    sudo service supervisor restart && \
-
-    # Setup production again to reflect the new site
-    yes | sudo bench setup production $USER && \
-
-    echo -e "${YELLOW}Enabling Scheduler...${NC}"
+    sudo service supervisor restart &&
+        # Setup production again to reflect the new site
+        yes | sudo bench setup production $USER &&
+        echo -e "${YELLOW}Enabling Scheduler...${NC}"
     sleep 1
     # Enable and resume the scheduler for the site
-    bench --site $site_name scheduler enable && \
-    bench --site $site_name scheduler resume && \
-    if [[ "$bench_version" == "version-15" ]]; then
-        echo -e "${YELLOW}Setting up Socketio, Redis and Supervisor...${NC}"
-        sleep 1
-        bench setup socketio
-        yes | bench setup supervisor
-        bench setup redis
-        sudo supervisorctl reload
-    fi
+    bench --site $site_name scheduler enable &&
+        bench --site $site_name scheduler resume &&
+        if [[ "$bench_version" == "version-15" ]]; then
+            echo -e "${YELLOW}Setting up Socketio, Redis and Supervisor...${NC}"
+            sleep 1
+            bench setup socketio
+            yes | bench setup supervisor
+            bench setup redis
+
+            node_dir=$(which node)
+
+            # Replace /usr/bin/node with the value from which node in ~/frappe-bench/config/supervisor.conf
+            supervisor_conf="$HOME/frappe-bench/config/supervisor.conf"
+            if [ -f "$supervisor_conf" ]; then
+                sed -i "s|/usr/bin/node|$node_dir|g" "$supervisor_conf"
+                echo -e "${GREEN}Updated node path in supervisor.conf to $node_dir${NC}"
+            else
+                echo -e "${RED}supervisor.conf not found at $supervisor_conf${NC}"
+            fi
+
+            sudo supervisorctl reread
+            sudo supervisorctl update
+            sudo supervisorctl reload
+        fi
     echo -e "${YELLOW}Restarting bench to apply all changes and optimizing environment pernissions.${NC}"
     sleep 1
-
 
     # Now to make sure the environment is fully setup
     sudo chmod 755 /home/$(echo $USER)
@@ -451,12 +483,13 @@ case "$continue_prod" in
     read -p "Response: " hrms_install
     hrms_install=$(echo "$hrms_install" | tr '[:upper:]' '[:lower:]')
     case "$hrms_install" in
-        "yes" | "y")
+    "yes" | "y")
         sleep 2
         # Setup supervisor and nginx config
-        bench get-app hrms --branch $bench_version && \
-        bench --site $site_name install-app hrms
+        bench get-app hrms --branch $bench_version &&
+            bench --site $site_name install-app hrms
         sleep 1
+        ;;
     esac
 
     echo -e "${YELLOW}Would you like to install SSL? (yes/no)${NC}"
@@ -465,41 +498,41 @@ case "$continue_prod" in
     continue_ssl=$(echo "$continue_ssl" | tr '[:upper:]' '[:lower:]')
 
     case "$continue_ssl" in
-        "yes" | "y")
-            echo -e "${YELLOW}Make sure your domain name is pointed to the IP of this instance and is reachable before your proceed.${NC}"
-            sleep 3
-            # Prompt user for email
-            read -p "Enter your email address: " email_address
+    "yes" | "y")
+        echo -e "${YELLOW}Make sure your domain name is pointed to the IP of this instance and is reachable before your proceed.${NC}"
+        sleep 3
+        # Prompt user for email
+        read -p "Enter your email address: " email_address
 
-            # Install Certbot
-            echo -e "${YELLOW}Installing Certbot...${NC}"
-            sleep 1
-            if [ "$DISTRO" == "Debian" ]; then
-                echo -e "${YELLOW}Fixing openssl package on Debian...${NC}"
-                sleep 4
-                sudo pip3 uninstall cryptography -y
-                yes | sudo pip3 install pyopenssl==22.0.0 cryptography==36.0.0
-                echo -e "${GREEN}Package fixed${NC}"
-                sleep 2
-            fi
-            # Install Certbot Classic
-            sudo apt install snapd -y && \
-            sudo snap install core && \
-            sudo snap refresh core && \
-            sudo snap install --classic certbot && \
+        # Install Certbot
+        echo -e "${YELLOW}Installing Certbot...${NC}"
+        sleep 1
+        if [ "$DISTRO" == "Debian" ]; then
+            echo -e "${YELLOW}Fixing openssl package on Debian...${NC}"
+            sleep 4
+            sudo pip3 uninstall cryptography -y
+            yes | sudo pip3 install pyopenssl==22.0.0 cryptography==36.0.0
+            echo -e "${GREEN}Package fixed${NC}"
+            sleep 2
+        fi
+        # Install Certbot Classic
+        sudo apt install snapd -y &&
+            sudo snap install core &&
+            sudo snap refresh core &&
+            sudo snap install --classic certbot &&
             sudo ln -s /snap/bin/certbot /usr/bin/certbot
-            
-            # Obtain and Install the certificate
-            echo -e "${YELLOW}Obtaining and installing SSL certificate...${NC}"
-            sleep 2
-            sudo certbot --nginx --non-interactive --agree-tos --email $email_address -d $site_name
-            echo -e "${GREEN}SSL certificate installed successfully.${NC}"
-            sleep 2
-            ;;
-        *)
-            echo -e "${RED}Skipping SSL installation...${NC}"
-            sleep 3
-            ;;
+
+        # Obtain and Install the certificate
+        echo -e "${YELLOW}Obtaining and installing SSL certificate...${NC}"
+        sleep 2
+        sudo certbot --nginx --non-interactive --agree-tos --email $email_address -d $site_name
+        echo -e "${GREEN}SSL certificate installed successfully.${NC}"
+        sleep 2
+        ;;
+    *)
+        echo -e "${RED}Skipping SSL installation...${NC}"
+        sleep 3
+        ;;
     esac
 
     # Now let's deactivate virtual environment
@@ -515,8 +548,8 @@ case "$continue_prod" in
     echo -e "Install additional apps as required. Visit https://docs.erpnext.com for Documentation."
     echo -e "Enjoy using ERPNext!"
     echo -e "--------------------------------------------------------------------------------${NC}"
-        ;;
-    *)
+    ;;
+*)
 
     echo -e "${YELLOW}Getting your site ready for development...${NC}"
     sleep 2
