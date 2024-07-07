@@ -386,7 +386,7 @@ case "$erpnext_install" in
 "yes" | "y")
     sleep 2
     # Setup supervisor and nginx config
-    bench get-app erpnext --branch $bench_version &&
+    bench get-app https://github.com/greekrode/erpnext --branch $bench_version &&
         bench --site $site_name install-app erpnext
     sleep 1
     ;;
@@ -486,8 +486,34 @@ case "$continue_prod" in
     "yes" | "y")
         sleep 2
         # Setup supervisor and nginx config
-        bench get-app hrms --branch $bench_version &&
+        bench get-app https://github.com/greekrode/hrms --branch $bench_version &&
             bench --site $site_name install-app hrms
+        sleep 1
+        ;;
+    esac
+
+    echo -e "${LIGHT_BLUE}Would you like to install Builder? (yes/no)${NC}"
+    read -p "Response: " builder_install
+    builder_install=$(echo "$builder_install" | tr '[:upper:]' '[:lower:]')
+    case "$hrms_install" in
+    "yes" | "y")
+        sleep 2
+        # Setup supervisor and nginx config
+        bench get-app https://github.com/greekrode/builder --branch $bench_version &&
+            bench --site $site_name install-app builder
+        sleep 1
+        ;;
+    esac
+
+    echo -e "${LIGHT_BLUE}Would you like to install Print Designer? (yes/no)${NC}"
+    read -p "Response: " print_designer_install
+    print_designer_install=$(echo "$print_designer_install" | tr '[:upper:]' '[:lower:]')
+    case "$print_designer_install" in
+    "yes" | "y")
+        sleep 2
+        # Setup supervisor and nginx config
+        bench get-app https://github.com/greekrode/print_designer --branch $bench_version &&
+            bench --site $site_name install-app print_designer
         sleep 1
         ;;
     esac
