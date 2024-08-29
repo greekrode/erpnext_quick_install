@@ -488,7 +488,7 @@ case "$continue_prod" in
     "yes" | "y")
         sleep 2
         # Setup supervisor and nginx config
-        bench get-app https://github.com/greekrode/hrms --branch develop &&
+        bench get-app https://github.com/greekrode/hrms --branch $bench_version &&
             bench --site $site_name install-app hrms
         sleep 1
         ;;
