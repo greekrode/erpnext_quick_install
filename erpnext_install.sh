@@ -151,6 +151,8 @@ else
 fi
 sleep 2
 
+sudo apt-get -y install supervisor
+
 # Check OS compatibility for Version 15
 if [[ "$bench_version" == "version-15" ]]; then
     if [[ "$(lsb_release -si)" != "Ubuntu" && "$(lsb_release -si)" != "Debian" ]]; then
