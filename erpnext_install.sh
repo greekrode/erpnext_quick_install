@@ -486,7 +486,7 @@ case "$continue_prod" in
     "yes" | "y")
         sleep 2
         # Setup supervisor and nginx config
-        bench get-app https://github.com/greekrode/hrms --branch $bench_version &&
+        bench get-app https://github.com/greekrode/hrms --branch develop &&
             bench --site $site_name install-app hrms
         sleep 1
         ;;
@@ -501,6 +501,58 @@ case "$continue_prod" in
         # Setup supervisor and nginx config
         bench get-app https://github.com/greekrode/builder --branch develop &&
             bench --site $site_name install-app builder
+        sleep 1
+        ;;
+    esac
+
+    echo -e "${LIGHT_BLUE}Would you like to install Helpdesk? (yes/no)${NC}"
+    read -p "Response: " helpdesk_install
+    helpdesk_install=$(echo "$helpdesk_install" | tr '[:upper:]' '[:lower:]')
+    case "$hrms_install" in
+    "yes" | "y")
+        sleep 2
+        # Setup supervisor and nginx config
+        bench get-app https://github.com/greekrode/helpdesk --branch develop &&
+            bench --site $site_name install-app helpdesk
+        sleep 1
+        ;;
+    esac
+
+    echo -e "${LIGHT_BLUE}Would you like to install Healthcare? (yes/no)${NC}"
+    read -p "Response: " healthcare_install
+    healthcare_install=$(echo "$healthcare_install" | tr '[:upper:]' '[:lower:]')
+    case "$hrms_install" in
+    "yes" | "y")
+        sleep 2
+        # Setup supervisor and nginx config
+        bench get-app https://github.com/greekrode/health --branch develop &&
+            bench --site $site_name install-app healthcare
+        sleep 1
+        ;;
+    esac
+
+    echo -e "${LIGHT_BLUE}Would you like to install Whitelabel? (yes/no)${NC}"
+    read -p "Response: " whitelabel_install
+    whitelabel_install=$(echo "$whitelabel_install" | tr '[:upper:]' '[:lower:]')
+    case "$hrms_install" in
+    "yes" | "y")
+        sleep 2
+        # Setup supervisor and nginx config
+        bench get-app https://github.com/greekrode/whitelabel --branch $bench_version &&
+            bench --site $site_name install-app whitelabel
+        sleep 1
+        ;;
+    esac
+
+    echo -e "${LIGHT_BLUE}Would you like to install CRM? (yes/no)${NC}"
+    read -p "Response: " crm_install
+    crm_install=$(echo "$crm_install" | tr '[:upper:]' '[:lower:]')
+    case "$hrms_install" in
+    "yes" | "y")
+        sleep 2
+        # Setup supervisor and nginx config
+        bench get-app https://github.com/greekrode/crm --branch develop &&
+            bench --site $site_name install-app crm
         sleep 1
         ;;
     esac
